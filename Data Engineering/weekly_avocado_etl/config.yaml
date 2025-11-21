@@ -1,0 +1,60 @@
+s3_bucket: "s3://customer-data-bucket/"
+
+# Medallion architecture paths
+bronze_path: "bronze/"
+silver_path: "silver/"
+gold_path: "gold/"
+
+# Final predictive model output location (Gold export)
+export_path: "gold/exports/"
+
+# Valid fertilizer types provided by the customer
+valid_fertilizer_types:
+  - "Heavy Metal"
+  - "Organic"
+  - "Inorganic"
+  - "Dry"
+  - "Toxic"
+
+# Consumer-level validation boundaries
+consumer_age_min: 0
+consumer_age_max: 130
+
+# Generated output file naming convention
+output_filename_pattern: "target_{iteration}_{run_date}.csv"
+run_date_format: "yyyyMMdd"    
+iteration_table: "system.iteration_tracker"  
+
+# COPY INTO formatting rules
+csv_format:
+  delimiter: "|"
+  quote: "\""
+  header: true
+  encoding: "US-ASCII"
+  line_separator: "\n"
+
+# Pipeline execution schedule
+workflow_schedule: "0 8 * * 1"  # Mondays @ 8:00 AM
+
+# Lakehouse table names for raw imports
+tables:
+  consumer: "consumer_raw"
+  purchase: "purchase_raw"
+  avocado: "avocado_raw"
+  fertilizer: "fertilizer_raw"
+
+# Silver-level cleaning and quality enforcement
+silver_rules:
+  enforce_not_null_primary_keys: true
+  enforce_valid_foreign_keys: true
+  trim_strings: true
+  normalize_case: true
+
+# Gold model configuration
+gold_output:
+  include_fertilizer_aggregation: true
+  fertilizer_aggregation_method: "concat_distinct" 
+  avocado_metrics:
+    calculate_days_sold: true
+    calculate_days_picked: true
+    include_ripe_index: true
